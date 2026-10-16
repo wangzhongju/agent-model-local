@@ -1,0 +1,35 @@
+services:
+  trainer:
+    image: ${DOCKER_IMAGE:-agent-model-local:0.1.0}
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        BASE_IMAGE: ${BASE_IMAGE:-pytorch/pytorch:2.7.1-cuda12.6-cudnn9-runtime}
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        APT_MIRROR: ${APT_MIRROR:-}
+    container_name: ${CONTAINER_NAME:-agent-model-local-cdky}
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
+    working_dir: /workspace
+    init: true
+    shm_size: 8gb
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    environment:
+      HF_HOME: /workspace/.cache/huggingface
+      HF_ENDPOINT: ${HF_ENDPOINT:-https://huggingface.co}
+      HF_TOKEN: ${HF_TOKEN:-}
+      HF_HUB_DISABLE_XET: "1"
+      HOME: /workspace/.cache/home
+      PYTHONPATH: /workspace/src
+      PYTHONUNBUFFERED: "1"
+      TOKENIZERS_PARALLELISM: "false"
+    volumes:
+      - ${WORKSPACE_PATH}:/workspace
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["${GPU_ID:-0}"]
+              capabilities: [gpu]

@@ -1,0 +1,120 @@
+{
+  "recorded_at_utc": "2026-10-14T09:13:26.366344+00:00",
+  "checks_exit_codes": {
+    "build-mirror": 0,
+    "acceptance": 0,
+    "scifact-data": 0,
+    "scifact-training": 0,
+    "scifact-evaluation": 0,
+    "download-wrapper": 0
+  },
+  "tests_passed": 7,
+  "gpu": "NVIDIA GeForce RTX 4090 D",
+  "torch": "2.7.1+cu126",
+  "cuda_runtime": "12.6",
+  "base_image": {
+    "repository": "pytorch/pytorch",
+    "tag": "2.7.1-cuda12.6-cudnn9-runtime",
+    "registry_digest": "sha256:2b59b1b91885677814f78be1f8df48a25d5dc952eb6580eaecfefca510f9afd3",
+    "config": "sha256:a707d52180cc02f7c29b030237ba3fd3fc86d5fa3ed3a94b65e65495aa6a2713"
+  },
+  "model_revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+  "demo_dataset": {
+    "valid": true,
+    "counts": {
+      "train": 48,
+      "dev": 6,
+      "test": 6
+    },
+    "corpus_count": 60
+  },
+  "scifact_dataset": {
+    "valid": true,
+    "counts": {
+      "train": 645,
+      "dev": 74,
+      "test": 88
+    },
+    "corpus_count": 5183
+  },
+  "dense_mining": {
+    "kept": 48,
+    "skipped": [],
+    "method": "dense",
+    "margin": 0.05,
+    "model": "models/base/Qwen3-Embedding-0.6B",
+    "instruction": "Given a search query, retrieve relevant passages that answer the query",
+    "max_length": 512,
+    "dataset_manifest_sha256": "3ed8781e9b903e2351815e38100a380d92006312cd2e694d2874b76f0543300b",
+    "output_sha256": "74b84fe1d81488e11821f7019c448b4369fd61623a98d0752e2d914fec0a6a35"
+  },
+  "demo_gpu_memory": {
+    "max_allocated_gb": 2.591503143310547,
+    "max_reserved_gb": 2.7421875
+  },
+  "scifact_gpu_memory": {
+    "max_allocated_gb": 4.3145599365234375,
+    "max_reserved_gb": 5.935546875
+  },
+  "resume_global_step": 3,
+  "best_checkpoint": "runs/embedding/scifact/qwen3-0.6b/lora-v1/checkpoint-1",
+  "final_training_checkpoint_max_abs_lora_B": 0.00020027128630317748,
+  "export_equivalence": {
+    "shape": [
+      3,
+      1024
+    ],
+    "max_absolute_error": 0.0037334635853767395,
+    "minimum_cosine": 0.99969881772995,
+    "norms": [
+      1.0,
+      1.0,
+      0.9999999403953552
+    ],
+    "sentence_transformers_max_error": 0.0028017982840538025,
+    "passed": true
+  },
+  "scifact_comparison": {
+    "baseline": {
+      "recall@1": 0.6496212121212122,
+      "mrr@1": 0.6704545454545454,
+      "ndcg@1": 0.6704545454545454,
+      "recall@5": 0.8636363636363636,
+      "mrr@5": 0.7522727272727273,
+      "ndcg@5": 0.7791128026328547,
+      "recall@10": 0.8977272727272727,
+      "mrr@10": 0.7570526695526696,
+      "ndcg@10": 0.7903692857704154
+    },
+    "candidate": {
+      "recall@1": 0.6496212121212122,
+      "mrr@1": 0.6704545454545454,
+      "ndcg@1": 0.6704545454545454,
+      "recall@5": 0.8636363636363636,
+      "mrr@5": 0.7522727272727273,
+      "ndcg@5": 0.7791128026328547,
+      "recall@10": 0.8977272727272727,
+      "mrr@10": 0.7570526695526696,
+      "ndcg@10": 0.7903692857704154
+    },
+    "delta": {
+      "recall@1": 0.0,
+      "mrr@1": 0.0,
+      "ndcg@1": 0.0,
+      "recall@5": 0.0,
+      "mrr@5": 0.0,
+      "ndcg@5": 0.0,
+      "recall@10": 0.0,
+      "mrr@10": 0.0,
+      "ndcg@10": 0.0
+    },
+    "passed": true,
+    "tolerance": 0.0
+  },
+  "limitations": [
+    "仅验证短程工程闭环，未完成业务领域效果优化",
+    "演示查询为模板弱标签",
+    "本地 LLM 生成接口未在本次下载生成模型实测",
+    "ReRank/LLM 专用训练器为后续扩展项"
+  ]
+}

@@ -1,0 +1,21 @@
+model: models/base/Qwen3-Embedding-0.6B
+# Only the synthetic document demo may train on draft template queries.
+allow_draft_data: true
+dataset_root: data/domains/demo/versions/v1
+train_file: data/domains/demo/versions/v1/embedding/bm25/train.jsonl
+dev_file: data/domains/demo/versions/v1/embedding/bm25/dev.jsonl
+output_dir: runs/embedding/demo/qwen3-0.6b/lora-v1
+instruction: Given a search query, retrieve relevant passages that answer the query
+max_length: 512
+negatives: 4
+batch_size: 4
+gradient_accumulation: 8
+learning_rate: 0.0002
+epochs: 3
+temperature: 0.05
+seed: 42
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: [q_proj, k_proj, v_proj, o_proj]
