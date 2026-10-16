@@ -77,3 +77,37 @@ def test_compare_rejects_mismatched_conditions(tmp_path):
     assert not compare(tmp_path/'a.json',tmp_path/'b.json',tmp_path/'out.json')['passed']
     changed['instruction']='different';write_json(tmp_path/'b.json',changed)
     with pytest.raises(ValueError,match='评估条件'):compare(tmp_path/'a.json',tmp_path/'b.json',tmp_path/'out.json')
+
+
+def test_download_scifact_uses_output_local_cache(tmp_path, monkeypatch):
+    import sys
+    from types import SimpleNamespace
+    from aml.data import download_scifact
+
+    calls = []
+
+    class Api:
+        def dataset_info(self, repo):
+            return SimpleNamespace(sha=f'{repo}-revision')
+
+    def load_dataset(repo, *args, **kwargs):
+        calls.append((repo, kwargs['cache_dir']))
+        if repo == 'BeIR/scifact-qrels':
+            return [{'query-id': 'q1', 'corpus-id': 'd1', 'score': 1}]
+        if args == ('corpus',):
+            return [{'_id': 'd1', 'title': 'title', 'text': 'body'}]
+        return [{'_id': 'q1', 'text': 'question'}]
+
+    monkeypatch.setitem(sys.modules, 'huggingface_hub', SimpleNamespace(HfApi=Api))
+    monkeypatch.setitem(sys.modules, 'datasets', SimpleNamespace(load_dataset=load_dataset))
+    output = tmp_path / 'scifact'
+    download_scifact(output)
+
+    cache_dir = str(output / '.cache' / 'huggingface')
+    assert calls == [
+        ('BeIR/scifact', cache_dir),
+        ('BeIR/scifact', cache_dir),
+        ('BeIR/scifact-qrels', cache_dir),
+    ]
+    assert (output / 'corpus.jsonl').is_file()
+    assert (output / 'queries.jsonl').is_file()

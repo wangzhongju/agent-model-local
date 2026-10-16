@@ -1,9 +1,14 @@
 .git
+.env
+.dev_bash_history
 .cache
 data
 models
 runs
 logs
 __pycache__
+.pytest_cache
+*.egg-info
+dist
 *.tar.gz
 

@@ -1,0 +1,4 @@
+# Shell scripts are deployed from Windows to Linux containers.
+*.sh text eol=lf
+docker/Dockerfile text eol=lf
+docker/*.yaml text eol=lf

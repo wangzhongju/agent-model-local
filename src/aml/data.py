@@ -147,12 +147,18 @@ def download_scifact(output):
     """Small public retrieval benchmark. Download exact revisions; local split by document groups."""
     from huggingface_hub import HfApi
     from datasets import load_dataset
-    output = Path(output); api = HfApi()
+    output = Path(output)
+    cache_dir = output / '.cache' / 'huggingface'
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    api = HfApi()
     rev = api.dataset_info('BeIR/scifact').sha
     qrev = api.dataset_info('BeIR/scifact-qrels').sha
-    corpus = load_dataset('BeIR/scifact','corpus',split='corpus',revision=rev)
-    queries = load_dataset('BeIR/scifact','queries',split='queries',revision=rev)
-    qrels = load_dataset('BeIR/scifact-qrels',split='train',revision=qrev)
+    corpus = load_dataset('BeIR/scifact','corpus',split='corpus',revision=rev,
+                          cache_dir=str(cache_dir))
+    queries = load_dataset('BeIR/scifact','queries',split='queries',revision=rev,
+                           cache_dir=str(cache_dir))
+    qrels = load_dataset('BeIR/scifact-qrels',split='train',revision=qrev,
+                         cache_dir=str(cache_dir))
     # Only official train labels are used. The local held-out splits are not official BEIR scores.
     positives = defaultdict(list)
     for r in qrels:

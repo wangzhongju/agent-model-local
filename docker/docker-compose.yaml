@@ -7,25 +7,23 @@ services:
       args:
         BASE_IMAGE: ${BASE_IMAGE:-pytorch/pytorch:2.7.1-cuda12.6-cudnn9-runtime}
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.org/simple}
+        PIP_TRUSTED_HOST: ${PIP_TRUSTED_HOST:-}
         APT_MIRROR: ${APT_MIRROR:-}
     container_name: ${CONTAINER_NAME:-agent-model-local-cdky}
+    hostname: ${DOCKER_HOSTNAME:-agent-model-local}
+    restart: unless-stopped
+    pid: host
+    ipc: host
+    network_mode: host
+    stdin_open: true
+    tty: true
+    privileged: true
+    # cap_drop: [ALL]
+    # cap_add: [AUDIT_WRITE, CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    init: true
     user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
     working_dir: /workspace
-    init: true
-    shm_size: 8gb
-    security_opt: ["no-new-privileges:true"]
-    cap_drop: [ALL]
-    environment:
-      HF_HOME: /workspace/.cache/huggingface
-      HF_ENDPOINT: ${HF_ENDPOINT:-https://huggingface.co}
-      HF_TOKEN: ${HF_TOKEN:-}
-      HF_HUB_DISABLE_XET: "1"
-      HOME: /workspace/.cache/home
-      PYTHONPATH: /workspace/src
-      PYTHONUNBUFFERED: "1"
-      TOKENIZERS_PARALLELISM: "false"
-    volumes:
-      - ${WORKSPACE_PATH}:/workspace
+    shm_size: ${DOCKER_SHM_SIZE:-16gb}
     deploy:
       resources:
         reservations:
@@ -33,3 +31,26 @@ services:
             - driver: nvidia
               device_ids: ["${GPU_ID:-0}"]
               capabilities: [gpu]
+    environment:
+      DISPLAY: ${DISPLAY:-:0}
+      DOCKER_USER: ${DOCKER_USERS:-cdky}
+      USER: ${DOCKER_USERS:-cdky}
+      DOCKER_USER_ID: ${USER_ID:-1000}
+      DOCKER_GRP: ${DOCKER_USERS:-cdky}
+      DOCKER_GRP_ID: ${GROUP_ID:-1000}
+      HISTFILE: /workspace/.dev_bash_history
+      PYTHONPATH: /workspace/src
+      PYTHONUNBUFFERED: "1"
+      TOKENIZERS_PARALLELISM: "false"
+      HF_ENDPOINT: ${HF_ENDPOINT:-https://huggingface.co}
+      HF_TOKEN: ${HF_TOKEN:-}
+      HF_HUB_DISABLE_XET: "1"
+    extra_hosts:
+      - "${DOCKER_HOSTNAME:-agent-model-local}:127.0.0.1"
+    volumes:
+      - /dev/null:/dev/raw1394
+      - /dev:/dev
+      - /media:/media
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /etc/localtime:/etc/localtime:ro
+      - ${WORKSPACE_PATH}:/workspace
