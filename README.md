@@ -24,6 +24,8 @@ bash docker/docker.sh exec bash scripts/demo.sh
 
 容器入口与 `vision-pipeline/docker/docker.sh` 保持同一风格：`start` 启动、初始化并进入容器，`into`/`shell` 进入已有容器，`exec` 执行单条命令，`logs` 持续跟踪日志。启动会在容器内建立与主机 UID/GID 对应的真实用户、组及标准 `/home/<用户>`，并提供容器内可用的 `sudo`、`vim`；训练仍以普通用户运行，不修改主机账户。镜像和长期容器不设置全局 Hugging Face 缓存目录，下载任务只在各自输出目录内保留局部断点缓存。
 
+Docker 环境创建风格已按 91 服务器上的 `vision-pipeline` 对齐：Compose 使用 host PID/IPC/network、`privileged`、主机 `/dev`/`/media`/X11 挂载及 16GB `shm_size` 配置，`env.sh` 会配置免密 sudo 和宿主机 `kernel.core_pattern`。这是一套面向受信任开发服务器的高权限配置，不应视为安全隔离边界；`GPU_ID` 仍用于 Compose 的 GPU 设备申请，但在 `privileged` 且挂载整个 `/dev` 时不能作为严格的设备隔离。完整影响、可配置参数和跨工程复用规则见[使用手册](docs/使用手册.md)与[搭建记录](docs/搭建记录.md)。
+
 ```text
 docker/                       Dockerfile、Compose、生命周期脚本、固定直接依赖
 configs/embedding/            模型训练配方；复制配置创建独立实验
